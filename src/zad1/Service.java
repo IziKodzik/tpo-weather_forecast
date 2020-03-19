@@ -6,11 +6,13 @@
 
 package zad1;
 
+import jdk.nashorn.internal.runtime.regexp.joni.Regex;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class Service {
 
 	final String API_KEY = "9a6d0312ff4d31904b5a7895193bad58";
+	public String city;
 
 	String country,
 			isoCode,
@@ -95,9 +98,9 @@ public class Service {
 		String jsonReply = "";
 
 		try {
-			//https://api.exchangeratesapi.io/latest?base=USD
+
 			jsonReply = getStringFromUrl("https://api.exchangeratesapi.io/latest?base=" +
-					currencyCode);
+					currency);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -107,7 +110,7 @@ public class Service {
 			Object obj = parser.parse(jsonReply);
 			JSONObject jsonObj = (JSONObject) obj;
 			JSONObject rates = (JSONObject) jsonObj.get("rates");
-			return (double) rates.get(currency);
+			return (double) rates.get(currencyCode);
 
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -121,13 +124,21 @@ public class Service {
 		if(currencyToCompare.equals("PLN"))
 			return 1.0;
 		try {
-			Document tableA = Jsoup.connect("http://www.nbp.pl/kursy/kursya.html").get();
-			Document tableB = Jsoup.connect("http://www.nbp.pl/kursy/kursyb.html").get();
+			Document pageA = Jsoup.connect("http://www.nbp.pl/kursy/kursya.html").get();
+			Document pageB = Jsoup.connect("http://www.nbp.pl/kursy/kursyb.html").get();
+			String value = "";
+			Elements element = pageA.getElementsContainingOwnText(currencyToCompare).next();
+			value = element.get(0).ownText().replace(',','.');
+			if(!value.equals(""))
+				return Double.parseDouble(value);
 
-			Elements listA = tableA.getElementsMatchingText(currencyToCompare);
-			System.out.println(listA);
-			System.out.println(listA.size() + "XDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
-			System.out.println(listA.get);
+			element = pageA.getElementsContainingOwnText(currencyToCompare).next();
+			value = element.get(0).ownText().replace(',','.');
+			if(value.equals(""))
+				return Double.parseDouble(value);
+
+			return 0.0;
+
 
 
 		}catch (IOException e){
