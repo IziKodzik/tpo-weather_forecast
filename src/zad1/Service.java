@@ -12,7 +12,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.*;
@@ -77,7 +76,7 @@ public class Service {
 	//http://api.openweathermap.org/data/2.5/weather?q=warsaw,pl&appid=9a6d0312ff4d31904b5a7895193bad58
 	public String getWeather(String city) {
 
-
+		this.city = city;
 		String result = "Not found";
 		try {
 			result = getStringFromUrl(
@@ -90,6 +89,16 @@ public class Service {
 			e.printStackTrace();
 		}
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "Service{" +
+				"city='" + city + '\'' +
+				", country='" + country + '\'' +
+				", isoCode='" + isoCode + '\'' +
+				", currencyCode='" + currencyCode + '\'' +
+				'}';
 	}
 
 	public Double getRateFor(String currency) {
@@ -132,7 +141,7 @@ public class Service {
 			if(!value.equals(""))
 				return Double.parseDouble(value);
 
-			element = pageA.getElementsContainingOwnText(currencyToCompare).next();
+			element = pageB.getElementsContainingOwnText(currencyToCompare).next();
 			value = element.get(0).ownText().replace(',','.');
 			if(value.equals(""))
 				return Double.parseDouble(value);
