@@ -105,6 +105,9 @@ public class Service {
 
 		this.currencyToCompare = currency;
 
+		if(currency.toUpperCase().equals(currencyCode))
+			return 1.0;
+
 		currency = currency.toUpperCase();
 
 
