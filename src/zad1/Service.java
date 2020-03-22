@@ -104,6 +104,10 @@ public class Service {
 	public Double getRateFor(String currency) {
 
 		this.currencyToCompare = currency;
+
+		currency = currency.toUpperCase();
+
+
 		String jsonReply = "";
 
 		try {
@@ -136,7 +140,7 @@ public class Service {
 			Document pageA = Jsoup.connect("http://www.nbp.pl/kursy/kursya.html").get();
 			Document pageB = Jsoup.connect("http://www.nbp.pl/kursy/kursyb.html").get();
 			String value = "";
-			Elements element = pageA.getElementsContainingOwnText(currencyToCompare).next();
+			Elements element = pageA.getElementsContainingOwnText(" " + currencyToCompare).next();
 			value = element.get(0).ownText().replace(',','.');
 			if(!value.equals(""))
 				return Double.parseDouble(value);
