@@ -12,9 +12,9 @@ import java.io.IOException;
 
 public class Main {
   public static void main(String[] args) {
-      Service s = new Service("Poland");
-    String weatherJson = s.getWeather("Warsaw");
-    Double rate1 = s.getRateFor("USD");
+    Service s = new Service("Italy");
+    String weatherJson = s.getWeather("Rome");
+    Double rate1 = s.getRateFor("THB");
     Double rate2 = s.getNBPRate();
     // ...
 

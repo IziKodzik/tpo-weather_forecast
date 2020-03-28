@@ -20,7 +20,8 @@ import java.util.Currency;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 //api key:
@@ -126,8 +127,11 @@ public class Service {
 			Object obj = parser.parse(jsonReply);
 			JSONObject jsonObj = (JSONObject) obj;
 			JSONObject rates = (JSONObject) jsonObj.get("rates");
-			return (double) rates.get(currencyCode);
-
+			try {
+				return (double) rates.get(currencyCode);
+			}catch (NullPointerException ex){
+				return -1.0;
+			}
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -137,22 +141,30 @@ public class Service {
 
 	public Double getNBPRate() {
 
-		if(currencyToCompare.equals("PLN"))
+		if(currencyCode.equals("PLN"))
 			return 1.0;
 		try {
 			Document pageA = Jsoup.connect("http://www.nbp.pl/kursy/kursya.html").get();
 			Document pageB = Jsoup.connect("http://www.nbp.pl/kursy/kursyb.html").get();
+
 			String value = "";
-			Elements element = pageA.getElementsContainingOwnText(" " + currencyToCompare).next();
-			value = element.get(0).ownText().replace(',','.');
-			if(!value.equals(""))
-				return Double.parseDouble(value);
+			Elements pElement = pageA.getElementsContainingOwnText(" " + currencyCode);
+			Elements element = pElement.next();
+			if(element.size() > 0) {
+				value = element.get(0).ownText().replace(',', '.');
+				if (!value.equals("")) {
+					return Double.parseDouble(value) / parsePointer(pElement.eachText().toString());
 
-			element = pageB.getElementsContainingOwnText(currencyToCompare).next();
-			value = element.get(0).ownText().replace(',','.');
-			if(value.equals(""))
-				return Double.parseDouble(value);
+				}
+			}
+			pElement = pageB.getElementsContainingOwnText(currencyCode);
+			element = pElement.next();
+			if(element.size() > 0) {
+				value = element.get(0).ownText().replace(',', '.');
+				if (!value.equals(""))
+					return Double.parseDouble(value) / parsePointer(pElement.eachText().toString());
 
+			}
 			return 0.0;
 
 
@@ -160,6 +172,20 @@ public class Service {
 		}catch (IOException e){
 			e.printStackTrace();
 		}
+		System.out.println("XD");
 		return 0.0;
+	}
+
+	private double parsePointer(String pointer){
+
+		StringBuilder sb = new StringBuilder();
+		for(int op = 0 ; op < pointer.length()
+				&& pointer.charAt(op) != ' '; ++ op ){
+			if((pointer.charAt(op)>= '0' && pointer.charAt(op) <= '9')
+					|| pointer.charAt(op)=='.' || pointer.charAt(op) ==',' )
+			sb.append(pointer.charAt(op));
+
+		}
+		return Double.parseDouble(sb.toString());
 	}
 }
