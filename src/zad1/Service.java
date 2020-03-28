@@ -172,7 +172,6 @@ public class Service {
 		}catch (IOException e){
 			e.printStackTrace();
 		}
-		System.out.println("XD");
 		return 0.0;
 	}
 
